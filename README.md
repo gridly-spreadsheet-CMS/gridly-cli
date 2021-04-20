@@ -20,7 +20,7 @@ Installation of the Gridly CLI and its dependencies use a range of packaging fea
 The safest way to install the Gridly CLI is to use pip in a virtualenv:
 
 ```
-$ python -m pip install awscli
+$ python -m pip install gridly-cli
 ```
 
 # Configuration
