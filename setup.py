@@ -7,14 +7,15 @@ setup(
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'Gridly CLI 1st version',   # Give a short description about your library
   author = 'Win Le',                   # Type in your name
-  author_email = 'trilevanthanh@gmail.com',      # Type in your E-Mail
+  author_email = 'tlv@localizedirect.com',      # Type in your E-Mail
   url = 'https://github.com/gridly-spreadsheet-CMS/gridly-cli',   # Provide either the link to your github or to your website
   download_url = 'https://github.com/gridly-spreadsheet-CMS/gridly-cli/archive/refs/tags/0.0.1.tar.gz',    # I explain this later on
-  keywords = ['CMS', 'CLI', 'GRIDLY'],   # Keywords that define your package best
+  keywords = ['GRIDLY', 'CLI', 'CMS', 'GRIDLY CLI'],   # Keywords that define your package best
   install_requires=[            # I get to this in a second
           'click',
           'requests',
-          'questionary'
+          'questionary',
+          'tabulate'
       ],
   entry_points='''
         [console_scripts]

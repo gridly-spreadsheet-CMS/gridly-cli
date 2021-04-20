@@ -2,17 +2,8 @@ import click
 import requests
 import os
 import questionary
+from tabulate import tabulate
 
-# class QuestionaryOption(click.Option):
-
-#     def __init__(self, param_decls=None, **attrs):
-#         click.Option.__init__(self, param_decls, **attrs)
-#         if not isinstance(self.type, click.Choice):
-#             raise Exception('ChoiceOption type arg must be click.Choice')
-
-#     def prompt_for_value(self, ctx):
-#         val = questionary.select(self.prompt, choices=self.type.choices).unsafe_ask()
-#         return val
 
 headers = {
     'Content-Type': 'application/json',
@@ -29,13 +20,13 @@ def gridly():
 ###### List projects ######
 ###########################
 @gridly.command()
-def project():
+def ls_project():
     """List all projects."""
     response = requests.get(
     'https://gateway.staging.gridly.com/v1/projects', headers=headers).json()
 
     for project in response:
-        print(project["name"])
+        click.echo(project["name"])
 
 ############################
 ###### List databases ######
@@ -61,13 +52,13 @@ def choose_project():
     return projectid
 
 @gridly.command()
-def database():
+def ls_database():
     """List all databases."""
     projectid = choose_project()
     response = requests.get(
     'https://gateway.staging.gridly.com/v1/databases?projectId=' + projectid, headers=headers).json()
     for database in response:
-        print(database["name"])
+        click.echo(database["name"])
 
 ########################
 ###### List grids ######
@@ -95,19 +86,19 @@ def choose_database():
     return databaseid
 
 @gridly.command()
-def grid():
+def ls_grid():
     """List all grids."""
     dbid = choose_database()
     response = requests.get(
     'https://gateway.staging.gridly.com/v1/grids?dbId=' + dbid, headers=headers).json()
     for grid in response:
-        print(grid["name"])
+        click.echo(grid["name"])
 
 ########################
 ###### List views ######
 ########################
 
-def choose_grids():
+def choose_grid():
     dbid = choose_database()
     grids = requests.get(
     'https://gateway.staging.gridly.com/v1/grids?dbId=' + dbid, headers=headers).json()
@@ -129,13 +120,121 @@ def choose_grids():
     return gridid
 
 @gridly.command()
-def view():
+def ls_view():
     """List all views."""
-    gridid = choose_grids()
+    gridid = choose_grid()
     response = requests.get(
     'https://gateway.staging.gridly.com/v1/views?gridId=' + gridid, headers=headers).json()
     for view in response:
-        print(view["name"])
+        click.echo(view["name"])
+
+#############################
+###### Retrieve a grid ######
+#############################
+
+@gridly.command()
+def grid():
+    """Retrieve the grid information."""
+    gridid = choose_grid()
+    response = requests.get(
+    'https://gateway.staging.gridly.com/v1/grids/' + gridid, headers=headers).json()
+    
+    columns = response.get("columns")
+    ls_column = []
+
+    for column in columns:
+        ls_column.append([column["id"], column["name"], column["type"]])
+
+    click.echo("Grid name: " + response.get("name"))
+    click.echo(tabulate(ls_column, headers=["Column ID", "Column Name", "Column Type"]))
+    
+
+#############################
+###### Retrieve a view ######
+#############################
+
+def choose_view():
+    gridid = choose_grid()
+    views = requests.get(
+    'https://gateway.staging.gridly.com/v1/views?gridId=' + gridid, headers=headers).json()
+
+    viewname = []
+    viewid = ""
+    for view in views:
+        viewname.append(view["name"])
+
+    chosen_viewname = questionary.select(
+    "Choose your grid:",
+    choices=viewname).ask()
+
+    for view in views:
+        if chosen_viewname == str(view["name"]):
+            viewid = str(view["id"])
+        else:
+            continue
+    return viewid
+
+@gridly.command()
+def view():
+    """Retrieve the view information."""
+    viewid = choose_view()
+    response = requests.get(
+    'https://gateway.staging.gridly.com/v1/views/' + viewid, headers=headers).json()
+    
+    columns = response.get("columns")
+    ls_column = []
+
+    for column in columns:
+        ls_column.append([column["id"], column["name"], column["type"]])
+
+    click.echo("View name: " + response.get("name"))
+    click.echo(tabulate(ls_column, headers=["Column ID", "Column Name", "Column Type"]))
+
+def Convert(a):
+    it = iter(a)
+    res_dct = dict(zip(it, it))
+    return res_dct
+
+@gridly.command()
+def records():
+    """List all records of a view"""
+    viewid = choose_view()
+
+    response_columns = requests.get(
+    'https://gateway.staging.gridly.com/v1/views/' + viewid, headers=headers).json()
+    
+    columns = response_columns.get("columns")
+
+    response_records = requests.get(
+    'https://gateway.staging.gridly.com/v1/views/' + viewid + "/records", headers=headers).json()
+
+    # Set up column keys before add value to each column
+    ls_cell = {} # ls_cell is a dictionary
+    for cell in response_records:
+        unique_cell = cell["cells"]
+        for value in unique_cell:
+            ls_cell.setdefault(value["columnId"], [])
+
+    # Map value to column
+    for cell in response_records:
+        unique_cell = cell["cells"]
+        for value in unique_cell:
+            if value["columnId"] in ls_cell and "value" in value:
+                ls_cell[value["columnId"]].append(value["value"])
+            elif value["columnId"] in ls_cell and "value" not in value:
+                ls_cell[value["columnId"]].append("")
+            else: 
+                continue
+    
+    for column in columns:
+        if column["id"] in ls_cell:
+            ls_cell[column["name"]] = ls_cell.pop(column["id"]) 
+        else:
+            continue
+
+    click.echo(tabulate(ls_cell, headers="keys"))
+
+
 
 if __name__ == '__main__':
     gridly()
