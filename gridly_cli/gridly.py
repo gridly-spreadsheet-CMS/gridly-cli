@@ -106,7 +106,7 @@ def choose_view():
 @click.option('--u', 'action', flag_value='u')
 def grid(action):
     """
-        --ls [List all grids]   -- u [Update grid name].
+        --ls [List all grids] / -- u [Update grid name].
     """
     if action == 'ls':
         dbid = choose_database()
@@ -165,7 +165,7 @@ def database(action):
 @click.option('--ex', 'action', flag_value='ex')
 def view(action):
     """
-        --ls [List all views]   --ex [Export a view to CSV file]
+        --ls [List all views] / --ex [Export a view to CSV file]
     """
     if action == 'ls':
         gridid = choose_grid()
@@ -209,7 +209,7 @@ def column(action):
 @click.option('--d', 'action', flag_value='d')
 def records(action):
     """
-        --ls [List all records of a view]   --d [Delete records]
+        --ls [List all records of a view] / --d [Delete records]
     """
     if action == 'ls':
         viewid = choose_view()
