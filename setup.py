@@ -22,7 +22,7 @@ setup(
           'click',
           'requests',
           'questionary',
-          'tabulate'
+          'tabulate',
       ],
   entry_points='''
         [console_scripts]
