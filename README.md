@@ -25,18 +25,18 @@ $ python -m pip install gridly-cli
 
 # Configuration
 
-Before using the Grdily CLI, you need to configure your API key. You can add the API key to Environment variables in this way:
+Before using the Gridly CLI, you need to configure your API key. You can add the API key to Environment variables in this way:
 
 - With MacOS and Linux:
 
 ```
-EXPORT API-KEY=<your-api-key>
+EXPORT GRIDLY_API_KEY=<your-api-key>
 ```
 
 - With Windows:
 
 ```
-SET API-KEY=<your-api-key>
+SET GRIDLY_API_KEY=<your-api-key>
 ```
 
 # Basic Commands
