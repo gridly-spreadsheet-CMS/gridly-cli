@@ -67,5 +67,5 @@ view      -ls [List all views] / -ex [Export a view to CSV file].
 For example, to list project, the command would be:
 
 ```
-$ gridly ls-project
+$ gridly project -ls
 ```
