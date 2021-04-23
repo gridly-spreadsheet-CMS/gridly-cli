@@ -102,11 +102,11 @@ def choose_view():
 
 ####### Grid #######
 @gridly.command()
-@click.option('--ls', 'action', flag_value='ls', default=True)
-@click.option('--u', 'action', flag_value='u')
+@click.option('-ls', 'action', flag_value='ls', default=True)
+@click.option('-u', 'action', flag_value='u')
 def grid(action):
     """
-        --ls [List all grids] / -- u [Update grid name].
+        -ls [List all grids] / -u [Update grid name].
     """
     if action == 'ls':
         dbid = choose_database()
@@ -131,10 +131,10 @@ def grid(action):
         gridly()
 
 @gridly.command()
-@click.option('--ls', 'action', flag_value='ls', default=True)
+@click.option('-ls', 'action', flag_value='ls', default=True)
 def project(action):
     """
-        --ls [List all projects].
+        -ls [List all projects].
     """
     if action == 'ls':
         response = requests.get(
@@ -146,10 +146,10 @@ def project(action):
         gridly()
 
 @gridly.command()
-@click.option('--ls', 'action', flag_value='ls', default=True)
+@click.option('-ls', 'action', flag_value='ls', default=True)
 def database(action):
     """
-        --ls [List all databases].
+        -ls [List all databases].
     """
     if action == 'ls':
         projectid = choose_project()
@@ -161,11 +161,11 @@ def database(action):
         gridly()
 
 @gridly.command()
-@click.option('--ls', 'action', flag_value='ls', default=True)
-@click.option('--ex', 'action', flag_value='ex')
+@click.option('-ls', 'action', flag_value='ls', default=True)
+@click.option('-ex', 'action', flag_value='ex')
 def view(action):
     """
-        --ls [List all views] / --ex [Export a view to CSV file]
+        -ls [List all views] / -ex [Export a view to CSV file].
     """
     if action == 'ls':
         gridid = choose_grid()
@@ -182,10 +182,10 @@ def view(action):
         gridly()
 
 @gridly.command()
-@click.option('--ls', 'action', flag_value='ls', default=True)
+@click.option('-ls', 'action', flag_value='ls', default=True)
 def column(action):
     """
-        --ls [List all columns of a grid].
+        -ls [List all columns of a grid].
     """
     if action == 'ls':
         gridid = choose_grid()
@@ -205,11 +205,11 @@ def column(action):
         gridly()
 
 @gridly.command()
-@click.option('--ls', 'action', flag_value='ls', default=True)
-@click.option('--d', 'action', flag_value='d')
+@click.option('-ls', 'action', flag_value='ls', default=True)
+@click.option('-d', 'action', flag_value='d')
 def records(action):
     """
-        --ls [List all records of a view] / --d [Delete records]
+        -ls [List all records of a view] / -d [Delete records].
     """
     if action == 'ls':
         viewid = choose_view()

@@ -56,13 +56,12 @@ Options:
 Commands:
 
 ```
-grid         Retrieve the grid information.
-ls-database  List all databases.
-ls-grid      List all grids.
-ls-project   List all projects.
-ls-view      List all views.
-records      List all records of a view    
-view         Retrieve the view information.
+column    -ls [List all columns of a grid].
+database  -ls [List all databases].
+grid      -ls [List all grids] / -u [Update grid name].
+project   -ls [List all projects].
+records   -ls [List all records of a view] / -d [Delete records].
+view      -ls [List all views] / -ex [Export a view to CSV file].
 ```
 
 For example, to list project, the command would be:
