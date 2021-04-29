@@ -309,7 +309,6 @@ def export(type, view_id, column_id, dest):
 
     chosen_columns = []
     #chosen_columns = choose_columns(view_id)
-    #file_path = select_file(f'{dest}grid_{view_id}.json')
     if column_id is not None:
         chosen_columns.append(column_id)
     records = get_records(view_id, chosen_columns)
