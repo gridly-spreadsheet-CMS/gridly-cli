@@ -7,7 +7,7 @@ import questionary
 from questionary import Separator, Choice, prompt
 from tabulate import tabulate
 
-from api import get_records, get_view
+from api import get_records, get_view, split_column
 from utils import dump_to_json_file
 
 headers = {
@@ -299,24 +299,33 @@ def view(view_id):
 @gridly.command()
 @click.option('-json', 'type', flag_value='json', default=True)
 @click.option('-csv', 'type', flag_value='csv', default=False)
+@click.option('-lang', 'target', flag_value='lang', default=False)
 @click.argument('view_id')
-@click.argument('column_id', required=False)
 @click.argument('dest', type=click.Path(exists=True), default='./', required=False)
-def export(type, view_id, column_id, dest):
+def export(type, target, view_id, dest):
     """
         Export all records in a view to JSON file
     """
 
-    chosen_columns = []
-    #chosen_columns = choose_columns(view_id)
-    if column_id is not None:
-        chosen_columns.append(column_id)
-    records = get_records(view_id, chosen_columns)
+    records = get_records(view_id)
+    lang_columns = []
+    lang_records = {}
+
+    if target == 'lang':
+        view = get_view(view_id)
+        for column in view["columns"]:
+            if 'languageCode' in column:
+                lang_columns.append(column["languageCode"])
+        for lang in lang_columns:
+            lang_records[lang] = split_column(records, lang)
+    else:
+        lang_records["all"] = records
 
     if type == 'json':
-        file_path = f'{dest}grid_{view_id}.json'
-        dump_to_json_file(file_path, records)
-        click.echo(f'!!! SUCCESS exported to: {file_path}')
+        for lang in lang_records:
+            file_path = f'{dest}grid_{view_id}_{lang}.json'
+            dump_to_json_file(file_path, lang_records[lang])
+            click.echo(f'!!! SUCCESS exported to: {file_path}')
 
     if type == 'csv':
         click.echo(f'I am in TODO')
