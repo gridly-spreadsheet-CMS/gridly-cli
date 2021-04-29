@@ -7,8 +7,8 @@ import questionary
 from questionary import Separator, Choice, prompt
 from tabulate import tabulate
 
-from api import get_records, get_view, split_column
-from utils import dump_to_json_file
+from cli.api import get_records, get_view, split_column
+from cli.utils import dump_to_json_file
 
 headers = {
     'Content-Type': 'application/json',
