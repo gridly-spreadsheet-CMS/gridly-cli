@@ -7,8 +7,8 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
   name = 'gridly-cli',
-  packages = [],
-  version = '0.1.1',
+  packages = ['cli'],
+  version = '0.1.2',
   license='MIT',
   description = 'Gridly CLI',
   long_description=long_description,
@@ -16,7 +16,7 @@ setup(
   author = 'LD',
   author_email = 'cn@localizedirect.com',
   url = 'https://gridly.com',
-  download_url = 'https://github.com/gridly-spreadsheet-CMS/gridly-cli/archive/refs/tags/0.1.1.tar.gz',
+  download_url = 'https://github.com/gridly-spreadsheet-CMS/gridly-cli/archive/refs/tags/0.1.2.tar.gz',
   keywords = ['GRIDLY', 'CLI', 'CMS', 'GRIDLY CLI'],
   install_requires=[
           'click',
@@ -26,7 +26,7 @@ setup(
       ],
   entry_points='''
         [console_scripts]
-        gridly=main:gridly
+        gridly=cli.main:gridly
     ''',
   classifiers=[
     'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
