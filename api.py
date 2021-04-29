@@ -1,14 +1,13 @@
 import requests
 import os
 import time
+from typing import Dict
 
 api_key = str(os.environ["GRIDLY_API_KEY"])
 
 MAX_RETRY = 3
 HTTP_STATUS = {
     'OK': 200,
-    'CREATED': 201,
-    'TOO_MANY_REQUESTS': 429,
     'NOT_FOUND': 404
 }
 
@@ -27,6 +26,16 @@ def _records_data_to_json(records, selected_column_ids):
                 formatted[cell["columnId"]] = value
         formatted_records.append(formatted)
     return formatted_records
+
+def split_column(records: Dict, column_id):
+    list = []
+    for record in records:
+        if column_id in record:
+            list.append({
+                "id": record["id"],
+                column_id: record[column_id]
+            })
+    return list
 
 def get(url, retry_times = 0):
     headers = {'Authorization': f'ApiKey {api_key}', 'Content-Type': 'application/json'}

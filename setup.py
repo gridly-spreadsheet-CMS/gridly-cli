@@ -6,9 +6,9 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-  name = 'gridly_cli',
-  packages = ['gridly_cli'],
-  version = '0.1.0',
+  name = 'gridly-cli',
+  packages = [],
+  version = '0.1.1',
   license='MIT',
   description = 'Gridly CLI',
   long_description=long_description,
@@ -16,7 +16,7 @@ setup(
   author = 'LD',
   author_email = 'cn@localizedirect.com',
   url = 'https://gridly.com',
-  download_url = 'https://github.com/gridly-spreadsheet-CMS/gridly-cli/archive/refs/tags/0.1.0.tar.gz',
+  download_url = 'https://github.com/gridly-spreadsheet-CMS/gridly-cli/archive/refs/tags/0.1.1.tar.gz',
   keywords = ['GRIDLY', 'CLI', 'CMS', 'GRIDLY CLI'],
   install_requires=[
           'click',
