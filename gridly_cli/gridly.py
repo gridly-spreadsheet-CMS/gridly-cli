@@ -3,12 +3,11 @@ import requests
 import os
 import json
 import questionary
-
 from questionary import Separator, Choice, prompt
 from tabulate import tabulate
 
-from gridly_cli.api import get_records, get_view, split_column
-from gridly_cli.utils import dump_to_json_file
+import api
+from utils import records_data_to_json, dump_to_json_file, dump_to_csv_file
 
 headers = {
     'Content-Type': 'application/json',
@@ -21,8 +20,7 @@ def gridly():
     pass
 
 def choose_project():
-    projects = requests.get(
-    'https://api.gridly.com/v1/projects', headers=headers).json()
+    projects = api.get_projects()
 
     projectname = []
     projectid = ""
@@ -30,7 +28,7 @@ def choose_project():
         projectname.append(project["name"])
 
     chosen_projectname = questionary.select(
-    "Choose your project:",
+    "Choose your Project:",
     choices=projectname).ask()
 
     for project in projects:
@@ -41,9 +39,8 @@ def choose_project():
     return projectid
 
 def choose_database():
-    projectid = choose_project()
-    databases = requests.get(
-    'https://api.gridly.com/v1/databases?projectId=' + projectid, headers=headers).json()
+    project_id = choose_project()
+    databases = api.get_databases(project_id)
 
     databasename = []
     databaseid = ""
@@ -51,7 +48,7 @@ def choose_database():
         databasename.append(database["name"])
 
     chosen_databasename = questionary.select(
-    "Choose your database:",
+    "Choose your Database:",
     choices=databasename).ask()
 
     for database in databases:
@@ -62,9 +59,8 @@ def choose_database():
     return databaseid
 
 def choose_grid():
-    dbid = choose_database()
-    grids = requests.get(
-    'https://api.gridly.com/v1/grids?dbId=' + dbid, headers=headers).json()
+    db_id = choose_database()
+    grids = api.get_grids(db_id)
 
     gridname = []
     gridid = ""
@@ -72,7 +68,7 @@ def choose_grid():
         gridname.append(grid["name"])
 
     chosen_gridname = questionary.select(
-    "Choose your grid:",
+    "Choose your Grid:",
     choices=gridname).ask()
 
     for grid in grids:
@@ -83,9 +79,8 @@ def choose_grid():
     return gridid
 
 def choose_view():
-    gridid = choose_grid()
-    views = requests.get(
-    'https://api.gridly.com/v1/views?gridId=' + gridid, headers=headers).json()
+    grid_id = choose_grid()
+    views = api.get_views(grid_id)
 
     viewname = []
     viewid = ""
@@ -104,7 +99,7 @@ def choose_view():
     return viewid
 
 def choose_columns(view_id):
-    view = get_view(view_id)
+    view = api.get_view(view_id)
     options = ['All']
     columns = view["columns"]
     for column in columns:
@@ -118,31 +113,27 @@ def choose_columns(view_id):
 
 ####### Grid #######
 @gridly.command()
-@click.option('-ls', 'action', flag_value='ls', default=True)
-@click.option('-u', 'action', flag_value='u')
+@click.option('-ls', 'action', flag_value='ls', default=True, help='To list all Grids')
+@click.option('-u', 'action', flag_value='u', help='To update Grid name')
 def grid(action):
     """
-        -ls [List all grids] / -u [Update grid name].
+        List all Grids / Update Grid name
     """
     if action == 'ls':
-        dbid = choose_database()
-        response = requests.get(
-        'https://api.gridly.com/v1/grids?dbId=' + dbid, headers=headers).json()
+        db_id = choose_database()
+        response = api.get_grids(db_id)
         for grid in response:
             click.echo(grid["name"])
     elif action == 'u':
-        gridid = choose_grid()
+        grid_id = choose_grid()
 
-        grid_name = questionary.text("New grid name:").ask()
-
+        grid_name = questionary.text("New Grid name:").ask()
         data = {
             "name": grid_name
         }
+        api.update_grid(grid_id, data)
 
-        requests.patch(
-            'https://api.gridly.com/v1/grids/' + gridid, headers=headers, data=json.dumps(data))
-
-        click.echo("Your grid name is changed")
+        click.echo("Your Grid has been changed")
     else: 
         gridly()
 
@@ -150,12 +141,10 @@ def grid(action):
 @click.option('-ls', 'action', flag_value='ls', default=True)
 def project(action):
     """
-        -ls [List all projects].
+        List all Projects
     """
     if action == 'ls':
-        response = requests.get(
-        'https://api.gridly.com/v1/projects', headers=headers).json()
-
+        response = api.get_projects()
         for project in response:
             click.echo(project["name"])
     else: 
@@ -165,35 +154,35 @@ def project(action):
 @click.option('-ls', 'action', flag_value='ls', default=True)
 def database(action):
     """
-        -ls [List all databases].
+        List all Databases
     """
     if action == 'ls':
-        projectid = choose_project()
-        response = requests.get(
-        'https://api.gridly.com/v1/databases?projectId=' + projectid, headers=headers).json()
+        project_id = choose_project()
+        response = api.get_databases(project_id)
         for database in response:
             click.echo(database["name"])
     else: 
         gridly()
 
 @gridly.command()
-@click.option('-ls', 'action', flag_value='ls', default=True)
-@click.option('-ex', 'action', flag_value='ex')
-def view(action):
+@click.option('-ls', 'action', flag_value='ls', help='To list all views')
+@click.option('-ex', 'action', flag_value='ex', help='To export a view to CSV file')
+@click.argument('view_id', required=False)
+def view(action, view_id):
     """
-        -ls [List all views] / -ex [Export a view to CSV file].
+        List all views / Export a view to CSV file
     """
     if action == 'ls':
-        gridid = choose_grid()
-        response = requests.get(
-        'https://api.gridly.com/v1/views?gridId=' + gridid, headers=headers).json()
+        grid_id = choose_grid()
+        response = api.get_views(grid_id)
         for view in response:
             click.echo(view["name"])
     elif action == 'ex':
-        viewid = choose_view()
-
-        requests.get(
-            'https://api.gridly.com/v1/views/' + viewid + '/export', headers=headers)
+        view_id = choose_view()
+        api.export_view(view_id)
+    elif view_id is not None:
+        view = api.get_view(view_id)
+        click.echo(json.dumps(view, indent=4))
     else: 
         gridly()
 
@@ -201,12 +190,11 @@ def view(action):
 @click.option('-ls', 'action', flag_value='ls', default=True)
 def column(action):
     """
-        -ls [List all columns of a grid].
+        List all columns of a Grid
     """
     if action == 'ls':
-        gridid = choose_grid()
-        response = requests.get(
-        'https://api.gridly.com/v1/grids/' + gridid, headers=headers).json()
+        grid_id = choose_grid()
+        response = api.get_grid(grid_id)
         
         columns = response.get("columns")
         ls_column = []
@@ -221,22 +209,20 @@ def column(action):
         gridly()
 
 @gridly.command()
-@click.option('-ls', 'action', flag_value='ls', default=True)
-@click.option('-d', 'action', flag_value='d')
-def records(action):
+@click.option('-ls', 'action', flag_value='ls', default=True, help='To list all records of a view')
+@click.option('-d', 'action', flag_value='d', help='To delete records')
+def record(action):
     """
-        -ls [List all records of a view] / -d [Delete records].
+        List all records of a view / Delete records
     """
     if action == 'ls':
-        viewid = choose_view()
+        view_id = choose_view()
 
-        response_columns = requests.get(
-        'https://api.gridly.com/v1/views/' + viewid, headers=headers).json()
+        response_columns = api.get_view(view_id)
         
         columns = response_columns.get("columns")
 
-        response_records = requests.get(
-        'https://api.gridly.com/v1/views/' + viewid + "/records", headers=headers).json()
+        response_records = api.get_records(view_id)
 
         # Set up column keys before add value to each column
         ls_cell = {} # ls_cell is a dictionary
@@ -264,72 +250,62 @@ def records(action):
 
         click.echo(tabulate(ls_cell, headers="keys", tablefmt="grid"))
     elif action == 'd':
-        viewid = choose_view()
-
-        response_records = requests.get(
-        'https://api.gridly.com/v1/views/' + viewid + "/records", headers=headers).json()
+        view_id = choose_view()
+        response_records = api.get_records(view_id)
 
         ls_record_id = []
         for record in response_records:
             ls_record_id.append(record["id"])
 
         ls_chosen_record = questionary.checkbox(
-            'Select columns which you want delete',
+            'Select records which you want delete',
             choices=ls_record_id).ask()
 
         data = {
             "ids": ls_chosen_record
         }
 
-        requests.delete(
-            'https://api.gridly.com/v1/views/' + viewid + '/records', headers=headers, data=json.dumps(data)
-        )
+        api.delete_records(view_id, data)
     else:
         gridly()
 
 @gridly.command()
-@click.argument('view_id')
-def view(view_id):
-    """
-        Get detail info of a view
-    """
-    view = get_view(view_id)
-    click.echo(json.dumps(view, indent=4))
-
-@gridly.command()
-@click.option('-json', 'type', flag_value='json', default=True)
-@click.option('-csv', 'type', flag_value='csv', default=False)
-@click.option('-lang', 'target', flag_value='lang', default=False)
+@click.option('-json', 'type_json', flag_value='json', default=True, help="To export to JSON file type")
+@click.option('-csv', 'type_csv', flag_value='csv', default=False, help="To export to CSV file type")
+@click.option('-lang', 'target', flag_value='lang', default=False, help="To export to separate language files")
 @click.argument('view_id')
 @click.argument('dest', type=click.Path(exists=True), default='./', required=False)
-def export(type, target, view_id, dest):
+def export(type_json, type_csv , target, view_id, dest):
     """
-        Export all records in a view to JSON file
+        Export all records of a view to files
     """
 
-    records = get_records(view_id)
+    rs_records = api.get_records(view_id)
+    records = records_data_to_json(rs_records)
     lang_columns = []
     lang_records = {}
 
     if target == 'lang':
-        view = get_view(view_id)
+        view = api.get_view(view_id)
         for column in view["columns"]:
             if 'languageCode' in column:
                 lang_columns.append(column["languageCode"])
         for lang in lang_columns:
-            lang_records[lang] = split_column(records, lang)
+            lang_records[lang] = api.split_column(records, lang)
     else:
         lang_records["all"] = records
 
-    if type == 'json':
+    if type_json == 'json':
         for lang in lang_records:
             file_path = f'{dest}grid_{view_id}_{lang}.json'
             dump_to_json_file(file_path, lang_records[lang])
-            click.echo(f'!!! SUCCESS exported to: {file_path}')
+            click.echo(f'!!!SUCCESS exported to: {file_path}')
 
-    if type == 'csv':
-        click.echo(f'I am in TODO')
-
+    if type_csv == 'csv':
+        for lang in lang_records:
+            file_path = f'{dest}grid_{view_id}_{lang}.csv'
+            dump_to_csv_file(file_path, lang_records[lang])
+            click.echo(f'!!!SUCCESS exported to: {file_path}')
 
 if __name__ == '__main__':
     gridly()

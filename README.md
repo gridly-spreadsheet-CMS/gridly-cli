@@ -56,12 +56,30 @@ Options:
 Commands:
 
 ```
-column    -ls [List all columns of a grid].
-database  -ls [List all databases].
-grid      -ls [List all grids] / -u [Update grid name].
-project   -ls [List all projects].
-records   -ls [List all records of a view] / -d [Delete records].
-view      -ls [List all views] / -ex [Export a view to CSV file].
+column    List all columns of a Grid
+
+database  List all Databases
+
+grid      List all Grids / Update Grid name
+            -ls To list all Grids
+            -u  To update Grid name
+
+project   List all Projects
+
+record    List all records of a view / Delete records
+            -ls To list all records of a view
+            -d To delete records
+
+view      List all views / Export a view to CSV file
+            -ls To list all views
+            -ex To export a view to CSV file
+
+export [OPTIONS] VIEW_ID [DEST]
+          Export all records of a view to files
+            -json To export to JSON file type
+            -csv  To export to CSV file type
+            -lang To export to separate language files
+            [DEST] Optinal. Path of folder where exporter will save files to. Default is current path.
 ```
 
 For example, to list project, the command would be:
