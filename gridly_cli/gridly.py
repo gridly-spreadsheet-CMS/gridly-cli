@@ -6,8 +6,8 @@ import questionary
 from questionary import Separator, Choice, prompt
 from tabulate import tabulate
 
-import api
-from utils import records_data_to_json, dump_to_json_file, dump_to_csv_file
+import gridly_cli.api as api
+from gridly_cli.utils import records_data_to_json, dump_to_json_file, dump_to_csv_file
 
 headers = {
     'Content-Type': 'application/json',

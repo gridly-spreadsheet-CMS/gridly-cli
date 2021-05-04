@@ -79,7 +79,7 @@ export [OPTIONS] VIEW_ID [DEST]
             -json To export to JSON file type
             -csv  To export to CSV file type
             -lang To export to separate language files
-            [DEST] Optinal. Path of folder where exporter will save files to. Default is current path.
+            [DEST] Optional. Path of folder where exporter will save files to. Default is current path.
 ```
 
 For example, to list project, the command would be:
