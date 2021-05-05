@@ -70,15 +70,14 @@ record    List all records of a view / Delete records
             -ls To list all records of a view
             -d To delete records
 
-view      List all views / Export a view to CSV file
+view      List all views / Get info of a specified view
             -ls To list all views
-            -ex To export a view to CSV file
 
 export [OPTIONS] VIEW_ID [DEST]
-          Export all records of a view to files
+          Export all records of a view to JSON and/or CSV files
             -json To export to JSON file type
             -csv  To export to CSV file type
-            -lang To export to separate language files
+            -lang To export translation language columns to separate files
             [DEST] Optional. Path of folder where exporter will save files to. Default is current path.
 ```
 
