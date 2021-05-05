@@ -23,7 +23,7 @@ def save_file(text, file_path):
         f.write(text)
 
 def dump_to_json_file(file_path, obj: Dict):
-    text = json.dumps(obj, indent=4)
+    text = json.dumps(obj, indent=4, ensure_ascii=False)
     save_file(text, file_path)
 
 def dump_to_csv_file(file_path, records: Dict):
