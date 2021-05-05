@@ -166,20 +166,16 @@ def database(action):
 
 @gridly.command()
 @click.option('-ls', 'action', flag_value='ls', help='To list all views')
-@click.option('-ex', 'action', flag_value='ex', help='To export a view to CSV file')
 @click.argument('view_id', required=False)
 def view(action, view_id):
     """
-        List all views / Export a view to CSV file
+        List all views / Get info of a specified view
     """
     if action == 'ls':
         grid_id = choose_grid()
         response = api.get_views(grid_id)
         for view in response:
             click.echo(view["name"])
-    elif action == 'ex':
-        view_id = choose_view()
-        api.export_view(view_id)
     elif view_id is not None:
         view = api.get_view(view_id)
         click.echo(json.dumps(view, indent=4))
@@ -270,14 +266,14 @@ def record(action):
         gridly()
 
 @gridly.command()
-@click.option('-json', 'type_json', flag_value='json', default=True, help="To export to JSON file type")
+@click.option('-json', 'type_json', flag_value='json', default=False, help="To export to JSON file type")
 @click.option('-csv', 'type_csv', flag_value='csv', default=False, help="To export to CSV file type")
-@click.option('-lang', 'target', flag_value='lang', default=False, help="To export to separate language files")
+@click.option('-lang', 'target', flag_value='lang', default=False, help="To export translation language columns to separate files")
 @click.argument('view_id')
 @click.argument('dest', type=click.Path(exists=True), default='./', required=False)
 def export(type_json, type_csv , target, view_id, dest):
     """
-        Export all records of a view to files
+        Export all records of a view to JSON and/or CSV files
     """
 
     rs_records = api.get_records(view_id)
