@@ -3,6 +3,11 @@ import json
 import os
 import time
 from typing import Dict
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path = env_path)
 
 api_key = str(os.environ["GRIDLY_API_KEY"])
 
