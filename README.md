@@ -25,18 +25,36 @@ $ python -m pip install gridly-cli
 
 # Configuration
 
-Before using the Gridly CLI, you need to configure your API key. You can add the API key to Environment variables in this way:
+Before using the Gridly CLI, you need to configure your API key, Project ID, Database ID, Grid ID, View ID. You can add those items to Environment variables in this way:
 
-- With MacOS and Linux:
-
-```
-$ EXPORT GRIDLY_API_KEY=<your-api-key>
-```
-
-- With Windows:
+- With the API key:
 
 ```
-$ SET GRIDLY_API_KEY=<your-api-key>
+$ dotenv set GRIDLY_API_KEY <your-api-key>
+```
+
+- With the Project ID:
+
+```
+$ dotenv set PROJECT_ID <your-project-id>
+```
+
+- With the Database ID:
+
+```
+$ dotenv set DB_ID <your-database-id>
+```
+
+- With the Grid ID:
+
+```
+$ dotenv set GRID_ID <your-grid-id>  
+```
+
+- With the View ID:
+
+```
+$ dotenv set VIEW_ID <your-view-id>
 ```
 
 # Basic Commands

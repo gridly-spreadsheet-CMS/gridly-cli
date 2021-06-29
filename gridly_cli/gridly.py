@@ -5,14 +5,14 @@ import json
 import questionary
 from questionary import Separator, Choice, prompt
 from tabulate import tabulate
+from dotenv import load_dotenv
+from pathlib import Path
 
 import gridly_cli.api as api
 from gridly_cli.utils import records_data_to_json, dump_to_json_file, dump_to_csv_file
 
-headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'ApiKey ' + str(os.environ["GRIDLY_API_KEY"])
-}
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path = env_path)
 
 @click.group()
 def gridly():
@@ -119,14 +119,15 @@ def grid(action):
     """
         List all Grids / Update Grid name
     """
+
+    db_id = str(os.environ["DB_ID"])
+    grid_id = str(os.environ["GRID_ID"])
+
     if action == 'ls':
-        db_id = choose_database()
         response = api.get_grids(db_id)
         for grid in response:
             click.echo(grid["name"])
     elif action == 'u':
-        grid_id = choose_grid()
-
         grid_name = questionary.text("New Grid name:").ask()
         data = {
             "name": grid_name
@@ -156,8 +157,10 @@ def database(action):
     """
         List all Databases
     """
+
+    project_id = str(os.environ["PROJECT_ID"])
+
     if action == 'ls':
-        project_id = choose_project()
         response = api.get_databases(project_id)
         for database in response:
             click.echo(database["name"])
@@ -171,8 +174,11 @@ def view(action, view_id):
     """
         List all views / Get info of a specified view
     """
+
+    grid_id = str(os.environ["GRID_ID"])
+    view_id = str(os.environ["VIEW_ID"])
+
     if action == 'ls':
-        grid_id = choose_grid()
         response = api.get_views(grid_id)
         for view in response:
             click.echo(view["name"])
@@ -188,8 +194,10 @@ def column(action):
     """
         List all columns of a Grid
     """
+
+    grid_id = str(os.environ["GRID_ID"])
+
     if action == 'ls':
-        grid_id = choose_grid()
         response = api.get_grid(grid_id)
         
         columns = response.get("columns")
@@ -211,9 +219,9 @@ def record(action):
     """
         List all records of a view / Delete records
     """
-    if action == 'ls':
-        view_id = choose_view()
+    view_id = str(os.environ["VIEW_ID"])
 
+    if action == 'ls':
         response_columns = api.get_view(view_id)
         
         columns = response_columns.get("columns")
@@ -246,7 +254,6 @@ def record(action):
 
         click.echo(tabulate(ls_cell, headers="keys", tablefmt="grid"))
     elif action == 'd':
-        view_id = choose_view()
         response_records = api.get_records(view_id)
 
         ls_record_id = []
@@ -269,13 +276,13 @@ def record(action):
 @click.option('-json', 'type_json', flag_value='json', default=False, help="To export to JSON file type")
 @click.option('-csv', 'type_csv', flag_value='csv', default=False, help="To export to CSV file type")
 @click.option('-lang', 'target', flag_value='lang', default=False, help="To export translation language columns to separate files")
-@click.argument('view_id')
+# @click.argument('view_id')
 @click.argument('dest', type=click.Path(exists=True), default='./', required=False)
-def export(type_json, type_csv , target, view_id, dest):
+def export(type_json, type_csv , target, dest):
     """
         Export all records of a view to JSON and/or CSV files
     """
-
+    view_id = str(os.environ["VIEW_ID"])
     rs_records = api.get_records(view_id)
     records = records_data_to_json(rs_records)
     lang_columns = []
